@@ -9,6 +9,19 @@ editor_options:
 library(tidyverse)
 library(patchwork)
 library(p8105.datasets)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_color_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
 ```
 
 ## Problem 1
@@ -78,33 +91,7 @@ accel_df =
   read_csv(
     "./accel_data.csv",
     ) %>% 
-  janitor::clean_names() %>% 
-  pivot_longer(
-    starts_with("activity"),
-    names_to = 'activity_num',
-    names_prefix = "activity_",
-    values_to = 'active_val'
-  ) %>% 
-  mutate(w_end = case_when(
-     day == "Monday" ~ "weekday",
-     day == "Tuesday" ~ "weekday",
-     day == "Wednesday" ~ "weekday",
-     day == "Thursday" ~ "weekday",
-     day == "Friday" ~ "weekday",
-     day == "Saturday" ~ "weekend",
-     day == "Sunday" ~ "weekend",
-     TRUE ~ ""
-  ))
-```
-
-This dataset contains `r nrow(accel_df)` observations of activity data over `r max(pull(accel_df, week))` weeks. This dataset contains the variables `r summarize(accel_df)`. 
-
-```{r accel table}
-accel_df = 
-  read_csv(
-    "./accel_data.csv",
-    ) %>% 
-  janitor::clean_names() %>% 
+  janitor::clean_names() %>%
   pivot_longer(
     starts_with("activity"),
     names_to = 'activity_num',
@@ -121,7 +108,35 @@ accel_df =
      day == "Sunday" ~ "weekend",
      TRUE ~ ""
   )) %>% 
-  group_by(day_id, day) %>% 
+  select(-day_id)
+```
+
+This dataset contains `r nrow(accel_df)` observations of activity data over `r max(pull(accel_df, week))` weeks. This dataset contains the variables `r summarize(accel_df)`. 
+
+```{r accel table}
+accel_df = 
+  read_csv(
+    "./accel_data.csv",
+    ) %>% 
+  janitor::clean_names() %>% 
+  mutate(day = forcats::fct_relevel(day, c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))) %>% 
+  pivot_longer(
+    starts_with("activity"),
+    names_to = 'activity_num',
+    names_prefix = "activity_",
+    values_to = 'active_val'
+  ) %>% 
+  mutate(w_end = case_when(
+     day == "Monday" ~ "weekday",
+     day == "Tuesday" ~ "weekday",
+     day == "Wednesday" ~ "weekday",
+     day == "Thursday" ~ "weekday",
+     day == "Friday" ~ "weekday",
+     day == "Saturday" ~ "weekend",
+     day == "Sunday" ~ "weekend",
+     TRUE ~ ""
+  )) %>% 
+  group_by(week, day) %>% 
   summarize(
     daily_total_act = sum(active_val)
   ) %>% 
@@ -136,6 +151,7 @@ accel_df =
     "./accel_data.csv",
     ) %>% 
   janitor::clean_names() %>% 
+  mutate(day = forcats::fct_relevel(day, c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))) %>% 
   pivot_longer(
     starts_with("activity"),
     names_to = 'activity_num',
@@ -152,11 +168,12 @@ accel_df =
      day == "Sunday" ~ "weekend",
      TRUE ~ ""
   )) %>% 
-  group_by(day_id, day) %>% 
+  group_by(week, day) %>% 
   summarize(
     daily_total_act = sum(active_val)
   ) %>% 
-  knitr::kable()
+  ggplot(aes(x = month, y = mean_tmax, color = name)) + 
+  geom_point()
 ```
 
 
