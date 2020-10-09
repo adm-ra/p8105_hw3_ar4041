@@ -111,7 +111,7 @@ accel_df =
   select(-day_id)
 ```
 
-This dataset contains `r nrow(accel_df)` observations of activity data over `r max(pull(accel_df, week))` weeks. This dataset contains the variables `r summarize(accel_df)`. 
+This dataset contains `r nrow(accel_df)` observations of activity data over `r max(pull(accel_df, week))` weeks. This dataset contains the variables `r names(accel_df)`. 
 
 ```{r accel table}
 accel_df = 
@@ -169,19 +169,14 @@ accel_df =
      TRUE ~ ""
   )) %>% 
   group_by(week, day) %>% 
-  summarize(
-    daily_total_act = sum(active_val)
-  ) %>% 
-  ggplot(aes(x = month, y = mean_tmax, color = name)) + 
+  ggplot(aes(x = activity_num, y = active_val, color = day)) + 
   geom_point()
 ```
-
 
 ## Problem 3
 
 ```{r}
-library(p8105.datasets)
 data("ny_noaa")
 ```
 
-
+This dataset contains the variables `r names(ny_noaa)`. The dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The variable "prcp" refers to precipitation in tens of millimeters; "snow" refers to snowfall in millimeters; and snwd refers to snow depth in millimeters. 
