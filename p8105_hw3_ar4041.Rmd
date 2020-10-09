@@ -5,7 +5,7 @@ Author: Adam R
 editor_options: 
   chunk_output_type: console
 ---
-```{r setup}
+```{r setup, include= FALSE}
 library(tidyverse)
 library(patchwork)
 library(p8105.datasets)
@@ -26,8 +26,10 @@ how many aisles, and which are they from?
 ```{r}
 instacart %>% 
   count(aisle) %>% 
-  arrange(desc(n)) %>% 
+  arrange(desc(n))
 ```
+
+There are 134 aisles, and the most ordered are fresh vegetables, fresh fruit, and packaged vegetables and fruits.
 
 let's make a plot
 
@@ -72,5 +74,13 @@ instacart %>%
 ## Problem 2
 
 
+
+
+## Problem 3
+
+```{r}
+library(p8105.datasets)
+data("ny_noaa")
+```
 
 
