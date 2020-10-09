@@ -17,13 +17,13 @@ library(p8105.datasets)
 data("instacart")
 ```
 
-this dataset contains `r nrow(instacart)` and `r ncol(instacart)` columns. 
+This dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. 
 
 Observations are the level of items in order by user. There are user/order variables -- user ID, order ID, order day, and order hour. There are also item variables -- name, aisle, department, and some numeric codes. [ADD MORE BEFORE SUBMITTING].
 
 how many aisles, and which are they from?
 
-```{r}
+```{r aisles}
 instacart %>% 
   count(aisle) %>% 
   arrange(desc(n))
@@ -33,7 +33,7 @@ There are 134 aisles, and the most ordered are fresh vegetables, fresh fruit, an
 
 let's make a plot
 
-```{r}
+```{r plot1}
 instacart %>% 
   count(aisle) %>% 
   filter(n > 10000) %>% 
@@ -48,7 +48,7 @@ instacart %>%
 
 making a table
 
-```{r}
+```{r table1}
 instacart %>% 
   filter(aisle %in% c("baking ingredients", "dog food care", "packaged vegetables fruits")) %>% 
   group_by(aisle) %>% 
@@ -60,7 +60,7 @@ instacart %>%
 ```
 
 apples v ice cream table 
-```{r}
+```{r apples v ice cream}
 instacart %>% 
   filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
   group_by(product_name, order_dow) %>% 
@@ -73,7 +73,91 @@ instacart %>%
 
 ## Problem 2
 
+```{r tidying}
+accel_df = 
+  read_csv(
+    "./accel_data.csv",
+    ) %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    starts_with("activity"),
+    names_to = 'activity_num',
+    names_prefix = "activity_",
+    values_to = 'active_val'
+  ) %>% 
+  mutate(w_end = case_when(
+     day == "Monday" ~ "weekday",
+     day == "Tuesday" ~ "weekday",
+     day == "Wednesday" ~ "weekday",
+     day == "Thursday" ~ "weekday",
+     day == "Friday" ~ "weekday",
+     day == "Saturday" ~ "weekend",
+     day == "Sunday" ~ "weekend",
+     TRUE ~ ""
+  ))
+```
 
+This dataset contains `r nrow(accel_df)` observations of activity data over `r max(pull(accel_df, week))` weeks. This dataset contains the variables `r summarize(accel_df)`. 
+
+```{r accel table}
+accel_df = 
+  read_csv(
+    "./accel_data.csv",
+    ) %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    starts_with("activity"),
+    names_to = 'activity_num',
+    names_prefix = "activity_",
+    values_to = 'active_val'
+  ) %>% 
+  mutate(w_end = case_when(
+     day == "Monday" ~ "weekday",
+     day == "Tuesday" ~ "weekday",
+     day == "Wednesday" ~ "weekday",
+     day == "Thursday" ~ "weekday",
+     day == "Friday" ~ "weekday",
+     day == "Saturday" ~ "weekend",
+     day == "Sunday" ~ "weekend",
+     TRUE ~ ""
+  )) %>% 
+  group_by(day_id, day) %>% 
+  summarize(
+    daily_total_act = sum(active_val)
+  ) %>% 
+  knitr::kable()
+```
+
+While major trends are not immediately apparent in the table, it does appear that there is less activity on weekends. 
+
+```{r}
+accel_df = 
+  read_csv(
+    "./accel_data.csv",
+    ) %>% 
+  janitor::clean_names() %>% 
+  pivot_longer(
+    starts_with("activity"),
+    names_to = 'activity_num',
+    names_prefix = "activity_",
+    values_to = 'active_val'
+  ) %>% 
+  mutate(w_end = case_when(
+     day == "Monday" ~ "weekday",
+     day == "Tuesday" ~ "weekday",
+     day == "Wednesday" ~ "weekday",
+     day == "Thursday" ~ "weekday",
+     day == "Friday" ~ "weekday",
+     day == "Saturday" ~ "weekend",
+     day == "Sunday" ~ "weekend",
+     TRUE ~ ""
+  )) %>% 
+  group_by(day_id, day) %>% 
+  summarize(
+    daily_total_act = sum(active_val)
+  ) %>% 
+  knitr::kable()
+```
 
 
 ## Problem 3
