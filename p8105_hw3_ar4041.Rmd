@@ -92,6 +92,7 @@ accel_df =
     "./accel_data.csv",
     ) %>% 
   janitor::clean_names() %>%
+    mutate(day = forcats::fct_relevel(day, c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))) %>% 
   pivot_longer(
     starts_with("activity"),
     names_to = 'activity_num',
@@ -108,7 +109,8 @@ accel_df =
      day == "Sunday" ~ "weekend",
      TRUE ~ ""
   )) %>% 
-  select(-day_id)
+  select(-day_id) %>% 
+  arrange(week, day)
 ```
 
 This dataset contains `r nrow(accel_df)` observations of activity data over `r max(pull(accel_df, week))` weeks. This dataset contains the variables `r names(accel_df)`. 
@@ -136,6 +138,7 @@ accel_df =
      day == "Sunday" ~ "weekend",
      TRUE ~ ""
   )) %>% 
+  select(-day_id) %>% 
   group_by(week, day) %>% 
   summarize(
     daily_total_act = sum(active_val)
@@ -145,7 +148,7 @@ accel_df =
 
 While major trends are not immediately apparent in the table, it does appear that there is less activity on weekends. 
 
-```{r}
+```{r plots}
 accel_df = 
   read_csv(
     "./accel_data.csv",
@@ -154,7 +157,7 @@ accel_df =
   mutate(day = forcats::fct_relevel(day, c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))) %>% 
   pivot_longer(
     starts_with("activity"),
-    names_to = 'activity_num',
+    names_to = 'active_num',
     names_prefix = "activity_",
     values_to = 'active_val'
   ) %>% 
@@ -169,14 +172,39 @@ accel_df =
      TRUE ~ ""
   )) %>% 
   group_by(week, day) %>% 
-  ggplot(aes(x = activity_num, y = active_val, color = day)) + 
-  geom_point()
+  ggplot(aes(x = active_num , y = active_val, color = day, alpha = .5)) + 
+  geom_point() + 
+  geom_smooth() +
+  geom_line(aes(group = day)) +
+   labs(
+    title = "Activity Plot",
+    x = "Week",
+    y = "Mean Activity"
+  )
 ```
+
+Based on this graph, it appears that activity 
 
 ## Problem 3
 
-```{r}
+```{r noaa}
 data("ny_noaa")
 ```
 
-This dataset contains the variables `r names(ny_noaa)`. The dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The variable "prcp" refers to precipitation in tens of millimeters; "snow" refers to snowfall in millimeters; and snwd refers to snow depth in millimeters. 
+This dataset contains the variables `r names(ny_noaa)`. The dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The variable "prcp" refers to precipitation in tenths of millimeters; "snow" refers to snowfall in millimeters; and snwd refers to snow depth in millimeters. 
+
+```{r noaa clean}
+ny_noaa %>% 
+  slice(1:1000) %>% 
+  separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
+  mutate(
+    tmax = as.numeric(tmax)/100,
+    tmin = as.numeric(tmin)/100
+  ) %>% 
+  group_by(snow) %>% 
+  count(snow) %>% 
+  arrange(desc(n))
+```
+
+
+
