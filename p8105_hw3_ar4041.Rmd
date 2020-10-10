@@ -173,18 +173,19 @@ accel_df =
      TRUE ~ ""
   )) %>% 
   group_by(week, day) %>% 
-  ggplot(aes(x = active_num , y = active_val, color = day, alpha = .5)) + 
-  geom_point() + 
+  summarise(active_mean = mean(active_val)) %>% 
+  ggplot(aes(x = week , y = active_mean, color = day)) + 
   geom_smooth() +
-  geom_line(aes(group = day)) +
    labs(
     title = "Activity Plot",
     x = "Week",
     y = "Mean Activity"
   )
+
+accel_df
 ```
 
-Based on this graph, it appears that activity 
+Based on this graph, it appears that weekend activity starts around the same level as weekday activity, but decreases significantly by week 3. 
 
 ## Problem 3
 
@@ -210,7 +211,6 @@ For snowfall, the most commonly seen values by far are 0 and NA. This is because
 
 ```{r}
 ny_noaa %>% 
-  slice_sample(n = 1000) %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
    filter(month == 1 | month == 7) %>% 
   mutate(
@@ -238,7 +238,6 @@ While there are occasional outlier years, max January temperatures appear to be 
 ```{r}
 tmax_tmin_p = 
   ny_noaa %>% 
-  slice_sample(n = 1000) %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
   mutate(
     tmax = as.numeric(tmax)/10,
@@ -256,7 +255,6 @@ tmax_tmin_p =
 
 snowfall_p = 
   ny_noaa %>% 
-  slice_sample(n = 10000) %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
   drop_na(snow) %>% 
   filter(snow > 0 & snow < 100) %>% 
