@@ -9,6 +9,7 @@ editor_options:
 library(tidyverse)
 library(patchwork)
 library(p8105.datasets)
+library("hexbin")
 
 knitr::opts_chunk$set(
   fig.width = 6,
@@ -32,7 +33,7 @@ data("instacart")
 
 This dataset contains `r nrow(instacart)` rows and `r ncol(instacart)` columns. 
 
-Observations are the level of items in order by user. There are user/order variables -- user ID, order ID, order day, and order hour. There are also item variables -- name, aisle, department, and some numeric codes. [ADD MORE BEFORE SUBMITTING].
+Observations are the level of items in order by user. There are user/order variables -- user ID, order ID, order day, and order hour. There are also item variables -- name, aisle, department, and some numeric codes. There's also some information about the user's past behaviors -- whether or not the customer has ordered this in the past and days since last order. 
 
 how many aisles, and which are they from?
 
@@ -195,7 +196,6 @@ This dataset contains the variables `r names(ny_noaa)`. The dataset has `r nrow(
 
 ```{r noaa clean}
 ny_noaa %>% 
-  slice(1:1000) %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
   mutate(
     tmax = as.numeric(tmax)/100,
@@ -206,5 +206,69 @@ ny_noaa %>%
   arrange(desc(n))
 ```
 
+For snowfall, the most commonly seen values by far are 0 and NA. This is because there are many days without snowfall in NY, and because there is a lot of missing data in this dataset. 
+
+```{r}
+ny_noaa %>% 
+  slice_sample(n = 1000) %>% 
+  separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
+   filter(month == 1 | month == 7) %>% 
+  mutate(
+    tmax = as.numeric(tmax)/10,
+    tmin = as.numeric(tmin)/10
+  ) %>% 
+  group_by(id, year, month) %>% 
+  summarize(tmax_mean = tmax) %>% 
+  drop_na(tmax_mean) %>% 
+  ggplot(aes(x = year, y = tmax_mean)) + 
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) + 
+  facet_grid(. ~ month,
+             labeller = label_both) +
+  theme(legend.position = "none") +
+  labs(
+    title = "Mean Max Temperatures by Year",
+    x = "Year",
+    y = "Mean Max"
+  )
+```
+
+While there are occasional outlier years, max January temperatures appear to be increasing as the years progress. July temperatures appear to have remained constant. 
+
+```{r}
+tmax_tmin_p = 
+  ny_noaa %>% 
+  slice_sample(n = 1000) %>% 
+  separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
+  mutate(
+    tmax = as.numeric(tmax)/10,
+    tmin = as.numeric(tmin)/10
+  ) %>% 
+  drop_na(tmin) %>% 
+  drop_na(tmax) %>% 
+  ggplot(aes(x = tmax, y = tmin, size = tmax)) +
+  geom_hex() +
+  labs(
+   title = "Max and Min Temperatures",
+    x = "Max Temperature",
+    y = "Min Temperature"
+  )
+
+snowfall_p = 
+  ny_noaa %>% 
+  slice_sample(n = 10000) %>% 
+  separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
+  drop_na(snow) %>% 
+  filter(snow > 0 & snow < 100) %>% 
+  ggplot(aes(x = year, fill = )) + 
+  geom_histogram() +
+  labs(
+    title = "Snowfall by Year",
+    x = "Year",
+    y = "# of Days 0-100 mm of snow"
+  )
+
+tmax_tmin_p + snowfall_p
+```
 
 
