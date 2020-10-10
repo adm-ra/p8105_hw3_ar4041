@@ -74,7 +74,7 @@ instacart %>%
 ```
 
 apples v ice cream table 
-```{r apples v ice cream}
+```{r apples_ice}
 instacart %>% 
   filter(product_name %in% c("Pink Lady Apples", "Coffee Ice Cream")) %>% 
   group_by(product_name, order_dow) %>% 
@@ -87,7 +87,7 @@ instacart %>%
 
 ## Problem 2
 
-```{r tidying}
+```{r tidying, warning = FALSE}
 accel_df = 
   read_csv(
     "./accel_data.csv",
@@ -116,7 +116,7 @@ accel_df =
 
 This dataset contains `r nrow(accel_df)` observations of activity data over `r max(pull(accel_df, week))` weeks. This dataset contains the variables `r names(accel_df)`. 
 
-```{r accel table}
+```{r accel_table, warning = FALSE}
 accel_df = 
   read_csv(
     "./accel_data.csv",
@@ -149,7 +149,7 @@ accel_df =
 
 While major trends are not immediately apparent in the table, it does appear that there is less activity on weekends. 
 
-```{r plots}
+```{r plots, warning = FALSE}
 accel_df = 
   read_csv(
     "./accel_data.csv",
@@ -195,7 +195,7 @@ data("ny_noaa")
 
 This dataset contains the variables `r names(ny_noaa)`. The dataset has `r nrow(ny_noaa)` rows and `r ncol(ny_noaa)` columns. The variable "prcp" refers to precipitation in tenths of millimeters; "snow" refers to snowfall in millimeters; and snwd refers to snow depth in millimeters. 
 
-```{r noaa clean}
+```{r noaa_clean, warning = FALSE}
 ny_noaa %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
   mutate(
@@ -209,7 +209,7 @@ ny_noaa %>%
 
 For snowfall, the most commonly seen values by far are 0 and NA. This is because there are many days without snowfall in NY, and because there is a lot of missing data in this dataset. 
 
-```{r jan and june temps}
+```{r temps, warning = FALSE}
 ny_noaa %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
    filter(month == 1 | month == 7) %>% 
@@ -235,7 +235,7 @@ ny_noaa %>%
 
 While there are occasional outlier years, max January temperatures appear to be increasing as the years progress. July temperatures appear to have remained constant. 
 
-```{r two plots put together}
+```{r tmax_min, warning = FALSE}
 tmax_tmin_p = 
   ny_noaa %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
