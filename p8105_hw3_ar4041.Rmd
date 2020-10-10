@@ -209,7 +209,7 @@ ny_noaa %>%
 
 For snowfall, the most commonly seen values by far are 0 and NA. This is because there are many days without snowfall in NY, and because there is a lot of missing data in this dataset. 
 
-```{r}
+```{r jan and june temps}
 ny_noaa %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
    filter(month == 1 | month == 7) %>% 
@@ -235,7 +235,7 @@ ny_noaa %>%
 
 While there are occasional outlier years, max January temperatures appear to be increasing as the years progress. July temperatures appear to have remained constant. 
 
-```{r}
+```{r two plots put together}
 tmax_tmin_p = 
   ny_noaa %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
