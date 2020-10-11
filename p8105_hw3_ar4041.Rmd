@@ -199,8 +199,8 @@ This dataset contains the variables `r names(ny_noaa)`. The dataset has `r nrow(
 ny_noaa %>% 
   separate(date, into = c("year", "month", "day"), convert = TRUE) %>% 
   mutate(
-    tmax = as.numeric(tmax)/100,
-    tmin = as.numeric(tmin)/100
+    tmax = as.numeric(tmax)/10,
+    tmin = as.numeric(tmin)/10
   ) %>% 
   group_by(snow) %>% 
   count(snow) %>% 
